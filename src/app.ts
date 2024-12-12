@@ -7,11 +7,22 @@ import studentRoutes from "./routes/students";
 import eventRoutes from "./routes/events";
 import RegistrationRoute from "./routes/registration";
 import coreTeamRoutes from "./routes/coreTeam";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 connectDB();
 
 const app = express();
+
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+});
+
+
+app.use(limiter);
 
 app.use(cors());
 app.use(helmet());
@@ -22,7 +33,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/register", RegistrationRoute);
 app.use("/api/coreTeam", coreTeamRoutes);
 
-//health check route
+
 app.get("/", (_req, res) => {
   res.send("API is running...");
 });
